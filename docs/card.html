@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Better Vesktop card</title>
+    <link rel="stylesheet" href="assets/fonts.css">
+    <link rel="stylesheet" href="assets/card.css">
+    <style>html,body{margin:0;background:#06060a}</style>
+</head>
+<body>
+    <!-- Rendered to PNG by scripts/render-cards.cjs for the README. Query: ?title=...&sub=... -->
+    <section class="vcard vcard--banner">
+        <div class="vcard__ghost" data-ghost></div>
+        <div class="vcard__body">
+            <div class="vcard__brand"><img src="assets/logo.svg" alt="">Better Vesktop</div>
+            <h1 class="vcard__title" id="title"></h1>
+            <p class="vcard__sub" id="sub"></p>
+        </div>
+    </section>
+    <script src="assets/ghost.js"></script>
+    <script>
+        var q = new URLSearchParams(location.search);
+        document.getElementById("title").textContent = q.get("title") || "Update";
+        var sub = document.getElementById("sub");
+        var strong = document.createElement("strong");
+        strong.textContent = "Better Vesktop";
+        sub.append(strong, " " + (q.get("sub") || ""));
+    </script>
+</body>
+</html>

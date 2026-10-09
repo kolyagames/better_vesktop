@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Better Vesktop</title>
+    <meta name="description" content="Vesktop with BetterDiscord built in: Vencord and BetterDiscord plugins in one sandboxed Discord client.">
+    <meta property="og:title" content="Better Vesktop">
+    <meta property="og:description" content="Vencord and BetterDiscord plugins in one sandboxed Discord client.">
+    <meta property="og:image" content="https://kolyagames.github.io/better_vesktop/assets/banner.png">
+    <script>document.documentElement.classList.add("js")</script>
+    <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+    <link rel="preload" href="assets/fonts/Nunito-200-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="assets/fonts.css">
+    <link rel="stylesheet" href="assets/card.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- vertical-only blur used by the smooth scroll; its strength follows the scroll speed -->
+    <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+        <filter id="vblur" x="-2%" y="-25%" width="104%" height="150%" color-interpolation-filters="sRGB">
+            <feGaussianBlur id="vblur-dev" in="SourceGraphic" stdDeviation="0 0"/>
+        </filter>
+    </svg>
+    <header class="bar">
+        <div class="wrap">
+            <a class="logo" href="#top"><img src="assets/logo.svg" alt="">Better Vesktop</a>
+            <nav aria-label="Sections">
+                <a href="#plugins" data-i18n="nav.plugins">Plugins</a>
+                <a href="#security" data-i18n="nav.security">Security</a>
+                <a href="#install" data-i18n="nav.install">Install</a>
+                <a href="#releases" data-i18n="nav.releases">Releases</a>
+                <a href="#faq" data-i18n="nav.faq">FAQ</a>
+                <a href="https://github.com/kolyagames/better_vesktop">GitHub</a>
+            </nav>
+            <button class="lang" id="lang" type="button" aria-label="Language">RU</button>
+        </div>
+    </header>
+
+    <main id="top">
+        <section class="hero vcard vcard--hero" aria-labelledby="hero-title">
+            <div class="vcard__ghost" data-ghost aria-hidden="true"></div>
+            <div class="vcard__body">
+                <div class="vcard__brand"><img src="assets/logo.svg" alt="">Better Vesktop</div>
+                <h1 class="vcard__title" id="hero-title" data-i18n="hero.title">Two clients. One window.</h1>
+                <p class="vcard__sub" data-i18n-html="hero.sub"><strong>Better Vesktop</strong> runs Vencord and BetterDiscord together, sandboxed.</p>
+                <div class="vcard__actions">
+                    <a class="btn btn--main" id="download" href="https://github.com/kolyagames/better_vesktop/releases/latest" data-i18n="hero.download">Download for Windows</a>
+                    <a class="btn" href="https://github.com/kolyagames/better_vesktop" data-i18n="hero.source">View the source</a>
+                </div>
+                <p class="note" data-i18n="hero.note">Portable, no installer. Windows 10 and 11, 64-bit.</p>
+            </div>
+        </section>
+
+        <section class="block" id="plugins">
+            <div class="wrap">
+                <h2 data-i18n="plugins.title">One plugin list for both clients</h2>
+                <p class="lead" data-i18n="plugins.lead">Vencord and BetterDiscord plugins sit side by side in one page, with one search and one set of filters. This is a small working copy of it: try the filters and the switches.</p>
+                <div class="demo" id="demo"></div>
+                <p class="demo-note" data-i18n="plugins.note">Sample data. In the app the list shows your own plugins, and the switches turn them on and off for real.</p>
+            </div>
+        </section>
+
+        <section class="block" id="security">
+            <div class="wrap">
+                <h2 data-i18n="security.title">Plugins can't reach your computer</h2>
+                <p class="lead" data-i18n="security.lead">Stock BetterDiscord gives plugins full access to Node.js. Better Vesktop keeps Discord's window sandboxed, like Vesktop does, and gives BetterDiscord a small bridge instead.</p>
+                <div class="rules">
+                    <div>
+                        <h3 data-i18n="security.can">Plugins can</h3>
+                        <ul>
+                            <li data-i18n="security.can1">read and write inside the BetterDiscord folder</li>
+                            <li data-i18n="security.can2">open files you pick yourself in a file dialog</li>
+                            <li data-i18n="security.can3">fetch websites and APIs on the internet</li>
+                            <li data-i18n="security.can4">open links in your browser</li>
+                        </ul>
+                    </div>
+                    <div class="no">
+                        <h3 data-i18n="security.cannot">Plugins can't</h3>
+                        <ul>
+                            <li data-i18n="security.no1">touch any other file or folder</li>
+                            <li data-i18n="security.no2">reach localhost or devices on your network</li>
+                            <li data-i18n="security.no3">start programs or open executables</li>
+                            <li data-i18n="security.no4">post to Discord webhooks or send commands to the app</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fine" data-i18n-html="security.fine">A plugin is still code running inside your Discord page, so it can see and change what the page shows. Install plugins from the BetterDiscord store or from authors you trust. You can loosen the limits in <code>Data/settings.json</code> under <code>betterDiscord</code>.</p>
+            </div>
+        </section>
+
+        <section class="block" id="install">
+            <div class="wrap">
+                <h2 data-i18n="install.title">Install in a minute</h2>
+                <p class="lead" data-i18n="install.lead">There's nothing to install. Unpack the folder and run it.</p>
+                <ol class="steps">
+                    <li><h3 data-i18n="install.s1t">Download</h3><p data-i18n="install.s1">Get the latest zip from the releases page.</p></li>
+                    <li><h3 data-i18n="install.s2t">Unpack and run</h3><p data-i18n-html="install.s2">Put the folder anywhere except Program Files and start <code>better-vesktop.exe</code>. If Windows SmartScreen warns you, choose More info, then Run anyway: the build isn't signed.</p></li>
+                    <li><h3 data-i18n="install.s3t">Log in</h3><p data-i18n="install.s3">Sign in to Discord as usual. Everything is stored next to the app, so deleting the folder removes it.</p></li>
+                </ol>
+                <div class="install-actions">
+                    <a class="btn btn--main" href="https://github.com/kolyagames/better_vesktop/releases/latest" data-i18n="hero.download">Download for Windows</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="block" id="releases">
+            <div class="wrap">
+                <h2 data-i18n="releases.title">Releases</h2>
+                <p class="lead" data-i18n="releases.lead">Every version with its changelog.</p>
+                <p class="status" id="releases-status" role="status"></p>
+                <div class="releases" id="releases-list"></div>
+            </div>
+        </section>
+
+        <section class="block" id="faq">
+            <div class="wrap">
+                <h2 data-i18n="faq.title">Questions</h2>
+                <div id="faq-list"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="wrap">
+            <span data-i18n-html="footer.team">Owner: <a href="https://github.com/kolyagames">kolyagames</a>. Developer: Claude (Anthropic).</span>
+            <span data-i18n="footer.unofficial">Better Vesktop is an unofficial project. It isn't affiliated with Discord, Vencord, Vesktop or BetterDiscord.</span>
+            <span data-i18n-html="footer.license">Licensed under GPL-3.0-or-later. Built on <a href="https://github.com/Vencord/Vesktop">Vesktop</a>, <a href="https://github.com/Vendicated/Vencord">Vencord</a> and <a href="https://github.com/BetterDiscord/BetterDiscord">BetterDiscord</a>.</span>
+        </div>
+    </footer>
+
+    <script src="assets/ghost.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+/*
+ * Vesktop, a desktop app aiming to give you a snappier Discord Experience
+ * Copyright (c) 2023 Vendicated and Vencord contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+import type { Rectangle } from "electron";
+
+export interface Settings {
+    discordBranch?: "stable" | "canary" | "ptb";
+    transparencyOption?: "none" | "mica" | "tabbed" | "acrylic";
+    webRTCIPHandlingPolicy?:
+        | "default"
+        | "default_public_interface_only"
+        | "default_public_and_private_interfaces"
+        | "disable_non_proxied_udp";
+    tray?: boolean;
+    minimizeToTray?: boolean;
+    autoStartMinimized?: boolean;
+    openLinksWithElectron?: boolean;
+    staticTitle?: boolean;
+    enableMenu?: boolean;
+    enableShadow?: boolean;
+    enableRoundedCorners?: boolean;
+    disableSmoothScroll?: boolean;
+    hardwareAcceleration?: boolean;
+    hardwareVideoAcceleration?: boolean;
+    arRPC?: boolean;
+    appBadge?: boolean;
+    enableTaskbarFlashing?: boolean;
+    disableMinSize?: boolean;
+    clickTrayToShowHide?: boolean;
+    customTitleBar?: boolean;
+
+    enableSplashScreen?: boolean;
+    splashTheming?: boolean;
+    splashColor?: string;
+    splashBackground?: string;
+    splashPixelated?: boolean;
+
+    spellCheckLanguages?: string[];
+
+    betterDiscord?: {
+        /** Defaults to true. Can also be disabled for a single run with --vanilla */
+        enabled?: boolean;
+        /** Let BetterDiscord plugins reach localhost / private network addresses over native fetch. Defaults to false. */
+        allowLocalNetwork?: boolean;
+        /** Extra folders BetterDiscord plugins may read and write, besides the BetterDiscord folder. */
+        extraPaths?: string[];
+    };
+
+    audio?: {
+        workaround?: boolean;
+
+        deviceSelect?: boolean;
+        granularSelect?: boolean;
+
+        ignoreVirtual?: boolean;
+        ignoreDevices?: boolean;
+        ignoreInputMedia?: boolean;
+
+        onlySpeakers?: boolean;
+        onlyDefaultSpeakers?: boolean;
+    };
+}
+
+export interface State {
+    maximized?: boolean;
+    minimized?: boolean;
+    windowBounds?: Rectangle;
+
+    firstLaunch?: boolean;
+
+    steamOSLayoutVersion?: number;
+    linuxAutoStartEnabled?: boolean;
+
+    vencordDir?: string;
+
+    updater?: {
+        ignoredVersion?: string;
+        snoozeUntil?: number;
+    };
+}

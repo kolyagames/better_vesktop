@@ -1,0 +1,44 @@
+name: Release
+
+on:
+    push:
+        tags: ["v*"]
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+jobs:
+    windows:
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - name: Check the network policy
+              run: pnpm tsx scripts/test-policy.mts
+            - run: pnpm tsc --noEmit
+              continue-on-error: true # Linux-only optional dependency (venmic) has no types on Windows
+            - name: Build installer and portable zip
+              run: pnpm build && pnpm exec electron-builder --win nsis zip --x64 --publish never
+            - name: Publish release
+              uses: softprops/action-gh-release@v2
+              if: startsWith(github.ref, 'refs/tags/')
+              with:
+                  generate_release_notes: true
+                  files: |
+                      dist/*.exe
+                      dist/*.zip
+                      dist/latest.yml
+                      dist/*.blockmap
+            - uses: actions/upload-artifact@v4
+              if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+              with:
+                  name: better-vesktop-win
+                  path: |
+                      dist/*.exe
+                      dist/*.zip
