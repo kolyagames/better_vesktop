@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- docs/assets/logo.svg as an adaptive icon foreground: 108dp canvas, logo centred in the safe zone -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group android:translateX="22" android:translateY="22">
+        <path android:fillColor="#8D82FF" android:pathData="M6,32a19,19 0,1 0,38 0a19,19 0,1 0,-38 0z" />
+        <path android:fillColor="#3E82E5" android:pathData="M20,32a19,19 0,1 0,38 0a19,19 0,1 0,-38 0z" />
+        <group>
+            <clip-path android:pathData="M20,32a19,19 0,1 0,38 0a19,19 0,1 0,-38 0z" />
+            <path android:fillColor="#E4E1FF" android:pathData="M6,32a19,19 0,1 0,38 0a19,19 0,1 0,-38 0z" />
+        </group>
+    </group>
+</vector>

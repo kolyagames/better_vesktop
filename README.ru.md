@@ -86,6 +86,22 @@ pnpm package          # установщик и zip через electron-builder
 | Основной процесс: пути, сеть, окна, редактор | `src/main/betterdiscord` |
 | Общие настройки и единая страница плагинов | `src/renderer/betterVesktop` |
 
+## Android
+
+Android-версия — то же самое на телефоне: веб-клиент Discord с discord.com, в который загружены Vencord и BetterDiscord. Ставится как Aliucord: отдельная иконка **BV Manager** пошагово устанавливает компоненты и держит их свежими.
+
+- **Discord** всегда последней версии: это веб-клиент, который отдаёт сам Discord.
+- **Vencord** — последний релиз его веб-сборки, менеджер скачивает его сам.
+- **BetterDiscord** — последний релиз, пропатченный прямо на телефоне теми же патчами, что и в десктопной сборке. Если новый релиз перестал подходить под патчи, остаётся встроенная в приложение версия, и менеджер об этом пишет. Настройки → «Встроенный BetterDiscord» переключает на неё вручную.
+- Магазин BetterDiscord работает внутри Discord. Файлы плагинов и тем со стороны импортируются в менеджере.
+- Та же политика, что на ПК: плагины видят только папку BetterDiscord, локальная сеть и вебхуки Discord закрыты. Мост отвечает только discord.com и требует ключ, который меняется при каждом запуске.
+
+**Установка:** скачай `better-vesktop-android-*.apk` из [релизов](https://github.com/kolyagames/better_vesktop/releases) (Android 9 и новее), открой BV Manager и нажми **Установить**.
+
+**Чего нет на телефоне:** демонстрации экрана, отдельного окна редактора кода, уведомлений о сообщениях (в WebView нет веб-уведомлений), статуса «Играет в…».
+
+Сборка: `pnpm build:android`, затем `gradle -p android assembleRelease` с Android SDK. GitHub Actions делает и то и другое на каждый пуш (`.github/workflows/android.yml`) и публикует релиз на теги `android-v<версия>`. Чтобы обновления вставали поверх друг друга, все релизы должны быть подписаны одним ключом: создай его командой `keytool -genkeypair -keystore release.jks -alias bettervesktop -keyalg RSA -keysize 4096 -validity 10000` и добавь секреты `ANDROID_KEYSTORE_BASE64` (`base64 -w0 release.jks`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` и `ANDROID_KEY_PASSWORD`.
+
 ## Вопросы
 
 **Могут ли забанить?** Правила Discord запрещают моды клиента, в том числе Vencord и BetterDiscord. На практике баны за темы и косметические плагины неизвестны, риск дают плагины, которые автоматизируют действия. Better Vesktop ничего не меняет в том, что видят серверы Discord.

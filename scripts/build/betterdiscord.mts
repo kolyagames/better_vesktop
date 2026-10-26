@@ -10,6 +10,8 @@ import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
 
+import { applyBdPatches } from "../../src/shared/bdPatches";
+
 /**
  * Prepares BetterDiscord's renderer files for the sandboxed bridge.
  *
@@ -21,46 +23,8 @@ import { join } from "path";
 const ASAR_PATH = "vendor/betterdiscord/betterdiscord.asar";
 const ASAR_SHA256 = "377cea1df2f006c8d1a402b25ac817a56193c4826b232830fd48201501a391b0";
 
-function patch(source: string, name: string, from: string, to: string) {
-    if (!source.includes(from)) throw new Error(`BetterDiscord patch "${name}": target not found, was BetterDiscord updated?`);
-    return source.replace(from, () => to);
-}
-
 function patchRenderer(source: string) {
-    // 1. No `vm` module in the sandbox: compile plugin code in the page itself, which is where it runs anyway.
-    source = patch(
-        source,
-        "compileFunction",
-        "A.vm.compileFunction(a,e,t)",
-        `(()=>{let f=typeof t=="string"?t:t?.filename;try{return new Function(...e,a+"\\n//# sourceURL=betterdiscord://betterdiscord/"+(f?encodeURI(String(f).replace(/\\\\/g,"/")):"anonymous"))}catch(r){return{name:r.name,message:r.message,stack:r.stack}}})()`
-    );
-
-    // 2. The settings search hook looks for a Discord string that no longer exists. That failure used to be swallowed by
-    //    an async function and silently aborted the whole settings tab, so make it non-fatal.
-    source = patch(
-        source,
-        "settingsSearch",
-        "this.patchSettingsSearch();let t=this.getLayoutBuilder()",
-        `try{this.patchSettingsSearch()}catch(_e){console.warn("[BetterDiscord] settings search patch skipped",_e)};let t=this.getLayoutBuilder()`
-    );
-
-    // 3. Log failures of the async settings patch instead of losing them.
-    source = patch(
-        source,
-        "settingsPatchErrors",
-        "async patchModalSettings(){",
-        `async patchModalSettings(){try{await this._pms()}catch(e){console.error("[BetterDiscord] patchModalSettings failed",e)}}async _pms(){`
-    );
-
-    // 4. BetterDiscord's lazy module waiter never fires when Vencord already loaded the settings layout module.
-    source = patch(
-        source,
-        "settingsRootWait",
-        `let e=await We(r=>r?.key==="$Root",{searchExports:!0,searchDefault:!1});`,
-        `let e=await new Promise(res=>{let n=0;let t=setInterval(()=>{let m;try{m=window.BdApi?.Webpack?.getModule(r=>r?.key==="$Root",{searchExports:true,searchDefault:false})}catch{}if(m||++n>600){clearInterval(t);res(m)}},250)});`
-    );
-
-    return source;
+    return applyBdPatches(source);
 }
 
 export async function buildBetterDiscord(outDir = "dist/js/betterdiscord") {
