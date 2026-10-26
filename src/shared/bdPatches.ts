@@ -58,3 +58,36 @@ export function applyBdPatches(source: string, patches: BdPatch[] = BD_RENDERER_
     }
     return source;
 }
+
+/**
+ * Patches for BetterDiscord's early hook (earlyRenderer.js), which rewrites Discord's webpack modules. Each `from` is a
+ * regular expression; `$1`..`$9` in `to` are its groups. A target that is not found is skipped: BetterDiscord may
+ * have fixed the problem itself.
+ */
+export interface BdEarlyPatch {
+    name: string;
+    from: string;
+    to: string;
+}
+
+export const BD_EARLY_PATCHES: BdEarlyPatch[] = [
+    // The hook turns a module into `(function(...){...}).apply(this, arguments)` by looking for "(params){" at the start
+    // of its source. Discord's web build for modern browsers (what a phone gets) ships modules as arrow functions,
+    // `(e,t,n)=>{`, and the hook produced "(e,t,n)=arguments[0]..." for every one of them: a syntax error, all modules
+    // fell back unpatched, and BetterDiscord's settings never appeared. Make them ordinary functions first.
+    {
+        name: "arrowModules",
+        from: "function (\\w+)\\((\\w+)\\)\\{let (\\w+)=\\2\\.match\\((\\w+)\\);return!",
+        to: 'function $1($2){$2=$2.replace(/^\\(([^()]*)\\)=>\\{/,(_,p)=>"function("+p+"){").replace(/^(\\w+)=>\\{/,(_,p)=>"function("+p+"){");let $3=$2.match($4);return!'
+    }
+];
+
+export function applyBdEarlyPatches(source: string, patches: BdEarlyPatch[] = BD_EARLY_PATCHES) {
+    for (const { from, to } of patches) {
+        const match = new RegExp(from).exec(source);
+        if (!match) continue;
+        const replacement = to.replace(/\$(\d)/g, (_, i) => match[Number(i)] ?? "");
+        source = source.slice(0, match.index) + replacement + source.slice(match.index + match[0].length);
+    }
+    return source;
+}

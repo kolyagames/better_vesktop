@@ -23,7 +23,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
 
-import { BD_RENDERER_PATCHES } from "../../src/shared/bdPatches";
+import { applyBdEarlyPatches, BD_EARLY_PATCHES, BD_RENDERER_PATCHES } from "../../src/shared/bdPatches";
 import { buildBetterDiscord } from "./betterdiscord.mts";
 import vencordDep from "./vencordDep.mjs";
 
@@ -62,8 +62,9 @@ try {
     const version = renderer.match(/version:"(\d+\.\d+\.\d+)"/)?.[1] ?? "unknown";
 
     await writeFile(join(OUT, "betterdiscord.js"), wrapRenderer(renderer));
-    await writeFile(join(OUT, "bd-early.js"), (await readFile(join(work, "earlyRenderer.js"), "utf8")) + "\n//# sourceURL=betterdiscord/earlyRenderer.js");
+    await writeFile(join(OUT, "bd-early.js"), applyBdEarlyPatches(await readFile(join(work, "earlyRenderer.js"), "utf8")) + "\n//# sourceURL=betterdiscord/earlyRenderer.js");
     await writeFile(join(OUT, "bd-patches.json"), JSON.stringify(BD_RENDERER_PATCHES, null, 2));
+    await writeFile(join(OUT, "bd-early-patches.json"), JSON.stringify(BD_EARLY_PATCHES, null, 2));
     await writeFile(join(OUT, "bundled.json"), JSON.stringify({ betterDiscord: version }, null, 2));
 } finally {
     await rm(work, { recursive: true, force: true });

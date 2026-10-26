@@ -256,7 +256,7 @@ $source
 
             val staging = File(root, "betterdiscord.new").apply { deleteRecursively(); mkdirs() }
             File(staging, "betterdiscord.js").writeText(wrapRenderer(patched))
-            File(staging, "bd-early.js").writeText("$early\n//# sourceURL=betterdiscord/earlyRenderer.js")
+            File(staging, "bd-early.js").writeText("${applyEarlyPatches(early)}\n//# sourceURL=betterdiscord/earlyRenderer.js")
             File(staging, "version.txt").writeText(version)
             swap(staging, bdDir)
             File(root, "betterdiscord.incompatible").delete()
@@ -278,6 +278,20 @@ $source
             val index = out.indexOf(from)
             if (index < 0) throw PatchException("патч \"${p.getString("name")}\" не подходит к этой версии")
             out = out.substring(0, index) + p.getString("to") + out.substring(index + from.length)
+        }
+        return out
+    }
+
+    /** Applies assets/bdvk/bd-early-patches.json (regular expressions). A patch that finds nothing is skipped. */
+    fun applyEarlyPatches(source: String): String {
+        val patches = JSONArray(context.assets.open("bdvk/bd-early-patches.json").bufferedReader().use { it.readText() })
+        var out = source
+        for (i in 0 until patches.length()) {
+            val p = patches.getJSONObject(i)
+            val match = Regex(p.getString("from")).find(out) ?: continue
+            val to = p.getString("to")
+            val replacement = Regex("\\$(\\d)").replace(to) { match.groupValues.getOrElse(it.groupValues[1].toInt()) { "" } }
+            out = out.substring(0, match.range.first) + replacement + out.substring(match.range.last + 1)
         }
         return out
     }
