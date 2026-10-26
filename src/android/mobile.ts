@@ -65,6 +65,35 @@ function navigate(path: string): boolean {
     }
 }
 
+/*
+ * Discord's web client lays out its own modals for phones, but BetterDiscord's (changelog, plugin settings, addon
+ * dialogs) are sized for a desktop window and spill past the screen on both sides. Clamp every dialog to the screen.
+ */
+const PHONE_CSS = `
+[role="dialog"], [role="dialog"] > *, .bd-modal, .bd-modal-root, .bd-changelog-modal, .bd-addon-modal {
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+}
+.bd-modal-content, .bd-changelog-modal, .bd-addon-modal-settings {
+    overflow-x: hidden;
+    overflow-wrap: anywhere;
+}
+.bd-modal-content img, .bd-modal-content video, .bd-modal-content iframe, .bd-modal-content pre {
+    max-width: 100% !important;
+    height: auto;
+}
+.bd-modal-content iframe { aspect-ratio: 16 / 9; }
+`;
+
+function addPhoneCss() {
+    const style = document.createElement("style");
+    style.id = "bdvk-phone-css";
+    style.textContent = PHONE_CSS;
+    (document.head ?? document.documentElement).appendChild(style);
+}
+addPhoneCss();
+
 try {
     if (typeof Vencord !== "undefined") setup();
 } catch (e) {
