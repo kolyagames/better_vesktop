@@ -86,6 +86,22 @@ How it fits together:
 | Main process side: paths, network, windows, editor | `src/main/betterdiscord` |
 | Merged settings and the unified plugin page | `src/renderer/betterVesktop` |
 
+## Android
+
+The Android app is the same idea on a phone: Discord's web client from discord.com, with Vencord and BetterDiscord loaded into it. It installs like Aliucord: a separate **BV Manager** icon installs the parts step by step and keeps them up to date.
+
+- **Discord** is always the newest version, because it is the web client Discord serves.
+- **Vencord** is the newest release of its web build, downloaded by the manager.
+- **BetterDiscord** is the newest release, patched on the phone with the same patches as the desktop build. If a new release no longer fits the patches, the version bundled with the app stays active, and the manager says so. Settings → "Bundled BetterDiscord" switches back by hand.
+- The BetterDiscord store works inside Discord. Plugin and theme files from elsewhere are imported in the manager.
+- The same policy as on desktop: plugins only see the BetterDiscord folder, the local network and Discord webhooks are blocked. The bridge only answers discord.com and needs a key that changes on every start.
+
+**Install:** download `better-vesktop-android-*.apk` from the [releases](https://github.com/kolyagames/better_vesktop/releases) (Android 9 or newer), open BV Manager and tap **Install**.
+
+**Not on the phone:** screen sharing, the separate code editor window, desktop notifications for messages (WebView has no web notifications), "Playing …" status.
+
+Building: `pnpm build:android`, then `gradle -p android assembleRelease` with the Android SDK. GitHub Actions does both on every push (`.github/workflows/android.yml`) and publishes a release for tags `android-v<version>`. For updates to install over each other, every release must be signed with the same key: create one with `keytool -genkeypair -keystore release.jks -alias bettervesktop -keyalg RSA -keysize 4096 -validity 10000` and add the secrets `ANDROID_KEYSTORE_BASE64` (`base64 -w0 release.jks`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`.
+
 ## FAQ
 
 **Can I get banned?** Discord's rules forbid client mods, which includes Vencord and BetterDiscord. In practice bans for themes and cosmetic plugins are not known; the risk comes from plugins that automate actions. Better Vesktop changes nothing about what Discord's servers see.
