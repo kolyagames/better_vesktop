@@ -275,11 +275,24 @@ $source
         for (i in 0 until patches.length()) {
             val p = patches.getJSONObject(i)
             val from = p.getString("from")
-            val index = out.indexOf(from)
-            if (index < 0) throw PatchException("патч \"${p.getString("name")}\" не подходит к этой версии")
-            out = out.substring(0, index) + p.getString("to") + out.substring(index + from.length)
+            val to = p.getString("to")
+            val patched = if (p.optBoolean("regex")) replaceRegex(out, from, to) else replaceLiteral(out, from, to)
+            if (patched != null) out = patched
+            else if (!p.optBoolean("optional")) throw PatchException("патч \"${p.getString("name")}\" не подходит к этой версии")
         }
         return out
+    }
+
+    private fun replaceLiteral(source: String, from: String, to: String): String? {
+        val index = source.indexOf(from)
+        return if (index < 0) null else source.substring(0, index) + to + source.substring(index + from.length)
+    }
+
+    /** First match only; `$1`..`$9` in [to] are the groups. Null when nothing matches. */
+    private fun replaceRegex(source: String, from: String, to: String): String? {
+        val match = Regex(from).find(source) ?: return null
+        val replacement = Regex("\\$(\\d)").replace(to) { match.groupValues.getOrElse(it.groupValues[1].toInt()) { "" } }
+        return source.substring(0, match.range.first) + replacement + source.substring(match.range.last + 1)
     }
 
     /** Applies assets/bdvk/bd-early-patches.json (regular expressions). A patch that finds nothing is skipped. */
@@ -288,10 +301,7 @@ $source
         var out = source
         for (i in 0 until patches.length()) {
             val p = patches.getJSONObject(i)
-            val match = Regex(p.getString("from")).find(out) ?: continue
-            val to = p.getString("to")
-            val replacement = Regex("\\$(\\d)").replace(to) { match.groupValues.getOrElse(it.groupValues[1].toInt()) { "" } }
-            out = out.substring(0, match.range.first) + replacement + out.substring(match.range.last + 1)
+            out = replaceRegex(out, p.getString("from"), p.getString("to")) ?: continue
         }
         return out
     }

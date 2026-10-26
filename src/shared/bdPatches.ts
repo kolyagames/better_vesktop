@@ -18,6 +18,10 @@ export interface BdPatch {
     name: string;
     from: string;
     to: string;
+    /** `from` is a regular expression and `$1`..`$9` in `to` are its groups. */
+    regex?: boolean;
+    /** Nothing to patch is fine (BetterDiscord may have fixed it) instead of an error. */
+    optional?: boolean;
 }
 
 export const BD_RENDERER_PATCHES: BdPatch[] = [
@@ -48,12 +52,42 @@ export const BD_RENDERER_PATCHES: BdPatch[] = [
         name: "settingsRootWait",
         from: `let e=await We(r=>r?.key==="$Root",{searchExports:!0,searchDefault:!1});`,
         to: `let e=await new Promise(res=>{let n=0;let t=setInterval(()=>{let m;try{m=window.BdApi?.Webpack?.getModule(r=>r?.key==="$Root",{searchExports:true,searchDefault:false})}catch{}if(m||++n>600){clearInterval(t);res(m)}},250)});`
+    },
+
+    // 5. The "version info" footer of BetterDiscord's settings sidebar assumes Discord's desktop host. In a browser the
+    //    host module is a stub, and reading it threw while the sidebar rendered, which crashed the whole settings page.
+    {
+        name: "versionInfoChannel",
+        regex: true,
+        optional: true,
+        from: `(\\w+)\\.RemoteModule\\?\\.releaseChannel\\?\\?window\\.GLOBAL_ENV\\?\\.RELEASE_CHANNEL\\?\\?"unknown"`,
+        to: `$1.RemoteModule?.releaseChannel||window.GLOBAL_ENV?.RELEASE_CHANNEL||"unknown"`
+    },
+    {
+        name: "versionInfoSafe",
+        regex: true,
+        optional: true,
+        from: `let (\\w+)=\\[(\\w+)\\(\\),(\\w+)\\(\\),(\\w+)\\(\\)\\];return`,
+        to: `let $1=[$2,$3,$4].map(f=>{try{return f()}catch{return"Unknown"}});return`
     }
 ];
 
 export function applyBdPatches(source: string, patches: BdPatch[] = BD_RENDERER_PATCHES) {
-    for (const { name, from, to } of patches) {
-        if (!source.includes(from)) throw new Error(`BetterDiscord patch "${name}": target not found, was BetterDiscord updated?`);
+    for (const { name, from, to, regex, optional } of patches) {
+        if (regex) {
+            const match = new RegExp(from).exec(source);
+            if (!match) {
+                if (optional) continue;
+                throw new Error(`BetterDiscord patch "${name}": target not found, was BetterDiscord updated?`);
+            }
+            const replacement = to.replace(/\$(\d)/g, (_, i) => match[Number(i)] ?? "");
+            source = source.slice(0, match.index) + replacement + source.slice(match.index + match[0].length);
+            continue;
+        }
+        if (!source.includes(from)) {
+            if (optional) continue;
+            throw new Error(`BetterDiscord patch "${name}": target not found, was BetterDiscord updated?`);
+        }
         source = source.replace(from, () => to);
     }
     return source;
