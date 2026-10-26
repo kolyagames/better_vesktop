@@ -63,4 +63,6 @@
     <string name="installing">Installing…</string>
     <string name="app_updated">Updated</string>
     <string name="app_update_failed">Update failed: %s</string>
+    <string name="share_log">Share log</string>
+    <string name="log_empty">No errors recorded yet.</string>
 </resources>

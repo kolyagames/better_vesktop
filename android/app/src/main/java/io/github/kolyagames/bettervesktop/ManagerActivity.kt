@@ -253,6 +253,10 @@ class ManagerActivity : Activity() {
         addons.addView(button(getString(R.string.import_files), primary = false) { importFiles() },
             LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)).apply { topMargin = dp(12) })
 
+        // log for bug reports
+        addons.addView(button(getString(R.string.share_log), primary = false) { shareLog() },
+            LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)).apply { topMargin = dp(8) })
+
         // the app itself
         val app = card(getString(R.string.card_app), column)
         appRow = row(app, "Better Vesktop")
@@ -342,6 +346,12 @@ class ManagerActivity : Activity() {
     // ---------------------------------------------------------------------------------------------------------------
     // importing plugins / themes
     // ---------------------------------------------------------------------------------------------------------------
+
+    private fun shareLog() {
+        val log = DebugLog.tail(this).ifBlank { getString(R.string.log_empty) }
+        val intent = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, log)
+        startActivity(Intent.createChooser(intent, getString(R.string.share_log)))
+    }
 
     private fun importFiles() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*").putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)

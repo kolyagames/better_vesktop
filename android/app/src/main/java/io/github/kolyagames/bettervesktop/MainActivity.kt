@@ -186,7 +186,8 @@ class MainActivity : Activity(), BdBridge.Host, DiscordWebClient.Callbacks {
         }
     }
 
-    override fun onRendererGone() {
+    override fun onRendererGone(crashed: Boolean) {
+        DebugLog.add(this, "WebView renderer " + if (crashed) "crashed" else "was killed by the system (memory)")
         // the WebView cannot be used after its renderer died; start over with a fresh one
         recreate()
     }
@@ -409,6 +410,15 @@ class MainActivity : Activity(), BdBridge.Host, DiscordWebClient.Callbacks {
     }
 
     private inner class ChromeClient : WebChromeClient() {
+        override fun onConsoleMessage(message: android.webkit.ConsoleMessage): Boolean {
+            val text = message.message() ?: return false
+            val tagged = text.contains("Better Vesktop") || text.contains("BetterDiscord") || text.contains("bdvk") || text.contains("Vencord")
+            if (message.messageLevel() == android.webkit.ConsoleMessage.MessageLevel.ERROR || tagged) {
+                DebugLog.add(this@MainActivity, "[${message.messageLevel()}] $text (${message.sourceId()?.substringAfterLast('/')}:${message.lineNumber()})")
+            }
+            return false
+        }
+
         override fun onShowFileChooser(view: WebView, callback: ValueCallback<Array<Uri>>, params: FileChooserParams): Boolean {
             fileChooserCallback?.onReceiveValue(null)
             fileChooserCallback = callback

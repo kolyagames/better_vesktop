@@ -61,4 +61,6 @@
     <string name="installing">Устанавливаю…</string>
     <string name="app_updated">Обновлено</string>
     <string name="app_update_failed">Обновление не удалось: %s</string>
+    <string name="share_log">Отправить лог</string>
+    <string name="log_empty">Ошибок пока нет.</string>
 </resources>

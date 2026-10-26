@@ -40,7 +40,7 @@ class DiscordWebClient(
     interface Callbacks {
         fun onTopPageChanged(url: String?, newDocument: Boolean)
         fun openExternal(uri: Uri)
-        fun onRendererGone()
+        fun onRendererGone(crashed: Boolean)
     }
 
     companion object {
@@ -160,7 +160,8 @@ class DiscordWebClient(
     }
 
     override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
-        callbacks.onRendererGone()
+        android.util.Log.w("BetterVesktop", "renderer gone, crashed=${detail.didCrash()}")
+        callbacks.onRendererGone(detail.didCrash())
         return true
     }
 }
